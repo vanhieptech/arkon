@@ -176,6 +176,20 @@ LLM_CATALOG: dict[str, LLMModelSpec] = {
         cost_per_1m_input_tokens=0.15,
         cost_per_1m_output_tokens=0.60,
     ),
+    # --- OpenRouter (hackathon parity via llm_base_url in Settings) ---
+    "openrouter/owl-alpha": LLMModelSpec(
+        id="openrouter/owl-alpha",
+        provider="openai",
+        model_id="openrouter/owl-alpha",
+        context_window_tokens=1_048_576,
+        max_output_tokens=262_144,
+        supports_tools=True,
+        supports_vision=False,
+        label="OpenRouter Owl Alpha (1M, tools)",
+        cost_per_1m_input_tokens=0.0,
+        cost_per_1m_output_tokens=0.0,
+        notes="Hackathon parity LLM via OpenRouter. Set llm_base_url=https://openrouter.ai/api/v1 in Settings.",
+    ),
 }
 
 

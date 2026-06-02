@@ -80,6 +80,18 @@ EMBEDDING_CATALOG: dict[str, EmbeddingModelSpec] = {
         cost_per_1m_tokens=0.13,
         notes="Highest quality OpenAI embedding. ~6.5x cost of 3-small.",
     ),
+    # --- OpenRouter (MRL 3072d for wiki_page_embeddings_3072) ---
+    "openrouter/qwen3-embedding-8b": EmbeddingModelSpec(
+        id="openrouter/qwen3-embedding-8b",
+        provider="openai",
+        model_id="qwen/qwen3-embedding-8b",
+        dimension=3072,
+        max_input_tokens=8192,
+        label="OpenRouter Qwen3 Embedding 8B (3072d MRL)",
+        cost_per_1m_tokens=None,
+        notes="MRL-truncated to 3072 for pgvector table wiki_page_embeddings_3072. "
+        "Verify via Settings test-embedding before ingest.",
+    ),
 }
 
 
