@@ -47,6 +47,9 @@ def _get_embedding_class(provider: ProviderType) -> type[EmbeddingProvider]:
     elif provider == ProviderType.OPENAI:
         from app.ai.providers.openai_provider import OpenAIEmbedding
         return OpenAIEmbedding
+    elif provider == ProviderType.BEDROCK:
+        from app.ai.providers.bedrock_provider import BedrockEmbedding
+        return BedrockEmbedding
     raise ValueError(f"Unsupported embedding provider: {provider}")
 
 
@@ -60,6 +63,9 @@ def _get_llm_class(provider: ProviderType) -> type[LLMProvider]:
     elif provider == ProviderType.ANTHROPIC:
         from app.ai.providers.anthropic_provider import AnthropicLLM
         return AnthropicLLM
+    elif provider == ProviderType.BEDROCK:
+        from app.ai.providers.bedrock_provider import BedrockLLM
+        return BedrockLLM
     raise ValueError(f"Unsupported LLM provider: {provider}")
 
 
@@ -247,7 +253,7 @@ class ProviderRegistry:
             model_id=spec.model_id,
             base_url=base_url,
             dimensions=spec.dimension,
-            extra={"spec_id": spec.id},
+            extra=_aws_extra(spec_id=spec.id),
         )
 
     async def _load_llm_config(self) -> ProviderConfig:
@@ -274,7 +280,7 @@ class ProviderRegistry:
             api_key=api_key,
             model_id=spec.model_id,
             base_url=base_url,
-            extra={"spec_id": spec.id},
+            extra=_aws_extra(spec_id=spec.id),
             spec=spec,
         )
 
@@ -310,10 +316,23 @@ _PROVIDER_LABELS = {
     "google": "Google Gemini",
     "openai": "OpenAI",
     "anthropic": "Anthropic",
+    "bedrock": "Amazon Bedrock",
     "ollama": "Ollama",
     "voyage": "Voyage AI",
     "cohere": "Cohere",
 }
+
+
+def _aws_extra(*, spec_id: str) -> dict:
+    """Bedrock clients read region / optional endpoint from app settings."""
+    from app.config import settings
+
+    extra: dict = {"spec_id": spec_id}
+    if settings.aws_region:
+        extra["aws_region"] = settings.aws_region
+    if settings.aws_endpoint_url:
+        extra["aws_endpoint_url"] = settings.aws_endpoint_url
+    return extra
 
 
 def supported_providers() -> dict:

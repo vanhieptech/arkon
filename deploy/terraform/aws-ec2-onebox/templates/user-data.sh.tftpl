@@ -1,0 +1,81 @@
+#!/bin/bash
+# Arkon EC2 one-box bootstrap — installs Docker, clones repo, starts compose.
+set -euo pipefail
+exec > /var/log/arkon-bootstrap.log 2>&1
+
+echo "=== Arkon bootstrap started $(date -Is) ==="
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -y
+apt-get install -y ca-certificates curl git awscli
+
+# Docker Engine + Compose plugin
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" \
+  > /etc/apt/sources.list.d/docker.list
+apt-get update -y
+apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+systemctl enable docker
+systemctl start docker
+usermod -aG docker ubuntu
+
+ARKON_DIR=/opt/arkon
+rm -rf "$ARKON_DIR"
+git clone --depth 1 --branch ${arkon_repo_branch} ${arkon_repo_url} "$ARKON_DIR"
+chown -R ubuntu:ubuntu "$ARKON_DIR"
+
+PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+AWS_ACCESS_KEY_ID="${aws_access_key_id}"
+AWS_SECRET_ACCESS_KEY="${aws_secret_access_key}"
+
+cat > "$ARKON_DIR/.env.docker" <<EOF
+POSTGRES_USER=arkon
+POSTGRES_PASSWORD=${postgres_password}
+POSTGRES_DB=arkon
+DATABASE_URL=postgresql+asyncpg://arkon:${postgres_password}@postgres:5432/arkon
+
+SECRET_KEY=${secret_key}
+MCP_TOKEN_PEPPER=${mcp_pepper}
+
+DEFAULT_ADMIN_EMAIL=${admin_email}
+DEFAULT_ADMIN_PASSWORD=${admin_password}
+
+MINIO_ENDPOINT=${s3_endpoint}
+MINIO_PUBLIC_ENDPOINT=${s3_endpoint}
+MINIO_ACCESS_KEY=$AWS_ACCESS_KEY_ID
+MINIO_SECRET_KEY=$AWS_SECRET_ACCESS_KEY
+MINIO_BUCKET=${bucket_name}
+MINIO_SECURE=true
+MINIO_REGION=${aws_region}
+
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PASSWORD=${redis_password}
+REDIS_DB=0
+
+CORS_ORIGINS=*
+
+NEXT_PUBLIC_API_URL=http://$PUBLIC_IP:5055
+
+AWS_REGION=${aws_region}
+AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+POC_CONFIGURE_BEDROCK=${poc_configure_bedrock}
+POC_LLM_SPEC_ID=${poc_llm_spec_id}
+POC_EMBEDDING_SPEC_ID=${poc_embedding_spec_id}
+POC_VERIFY_AI=1
+EOF
+
+chown ubuntu:ubuntu "$ARKON_DIR/.env.docker"
+chmod 600 "$ARKON_DIR/.env.docker"
+
+cd "$ARKON_DIR"
+sudo -u ubuntu docker compose --env-file .env.docker up -d --build
+
+echo "=== Arkon bootstrap finished $(date -Is) ==="
+echo "UI:  http://$PUBLIC_IP:3119"
+echo "API: http://$PUBLIC_IP:5055"

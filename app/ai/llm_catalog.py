@@ -176,6 +176,33 @@ LLM_CATALOG: dict[str, LLMModelSpec] = {
         cost_per_1m_input_tokens=0.15,
         cost_per_1m_output_tokens=0.60,
     ),
+    # --- Amazon Bedrock (IAM credentials; enable models in AWS console) ---
+    "bedrock/claude-3-5-sonnet": LLMModelSpec(
+        id="bedrock/claude-3-5-sonnet",
+        provider="bedrock",
+        model_id="anthropic.claude-3-5-sonnet-20241022-v2:0",
+        context_window_tokens=200_000,
+        max_output_tokens=8192,
+        supports_tools=True,
+        supports_vision=False,
+        label="Bedrock Claude 3.5 Sonnet",
+        cost_per_1m_input_tokens=3.0,
+        cost_per_1m_output_tokens=15.0,
+        notes="Requires model access in Bedrock. Uses AWS credential chain (no API key).",
+    ),
+    "bedrock/claude-3-haiku": LLMModelSpec(
+        id="bedrock/claude-3-haiku",
+        provider="bedrock",
+        model_id="anthropic.claude-3-haiku-20240307-v1:0",
+        context_window_tokens=200_000,
+        max_output_tokens=4096,
+        supports_tools=True,
+        supports_vision=False,
+        label="Bedrock Claude 3 Haiku",
+        cost_per_1m_input_tokens=0.25,
+        cost_per_1m_output_tokens=1.25,
+        notes="Faster/cheaper Bedrock Claude for dev POC.",
+    ),
     # --- OpenRouter (hackathon parity via llm_base_url in Settings) ---
     "openrouter/owl-alpha": LLMModelSpec(
         id="openrouter/owl-alpha",

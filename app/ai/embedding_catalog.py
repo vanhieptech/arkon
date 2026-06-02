@@ -80,6 +80,17 @@ EMBEDDING_CATALOG: dict[str, EmbeddingModelSpec] = {
         cost_per_1m_tokens=0.13,
         notes="Highest quality OpenAI embedding. ~6.5x cost of 3-small.",
     ),
+    # --- Amazon Bedrock ---
+    "bedrock/titan-embed-v2": EmbeddingModelSpec(
+        id="bedrock/titan-embed-v2",
+        provider="bedrock",
+        model_id="amazon.titan-embed-text-v2:0",
+        dimension=1024,
+        max_input_tokens=8192,
+        label="Bedrock Titan Embed Text v2 (1024d)",
+        cost_per_1m_tokens=0.02,
+        notes="Uses wiki_page_embeddings_1024. IAM auth; enable Titan in Bedrock console.",
+    ),
     # --- OpenRouter (MRL 3072d for wiki_page_embeddings_3072) ---
     "openrouter/qwen3-embedding-8b": EmbeddingModelSpec(
         id="openrouter/qwen3-embedding-8b",

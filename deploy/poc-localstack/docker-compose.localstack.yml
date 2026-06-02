@@ -1,0 +1,128 @@
+# LocalStack S3 POC — use with base compose:
+#   ./deploy/poc-localstack/up.sh
+#
+# Replaces MinIO with LocalStack S3 (MinIO container scaled to 0).
+
+services:
+  localstack:
+    image: localstack/localstack:4.4.0
+    container_name: arkon_localstack
+    restart: unless-stopped
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: s3
+      DEBUG: ${LOCALSTACK_DEBUG:-0}
+      AWS_DEFAULT_REGION: us-east-1
+      LOCALSTACK_AUTH_TOKEN: ${LOCALSTACK_AUTH_TOKEN:-}
+    volumes:
+      - localstack_data:/var/lib/localstack
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+
+  localstack-init:
+    image: amazon/aws-cli:2.22.35
+    container_name: arkon_localstack_init
+    restart: "no"
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: us-east-1
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        EP=http://localstack:4566
+        aws --endpoint-url="$$EP" s3 mb "s3://$${MINIO_BUCKET:-arkon-files}" 2>/dev/null || true
+        aws --endpoint-url="$$EP" s3 ls
+        echo "LocalStack S3 bucket ready."
+
+  # Disable MinIO when using this overlay (up.sh passes --scale minio=0).
+  minio:
+    profiles: ["never-used-minio-profile"]
+
+  migrator:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+      localstack-init:
+        condition: service_completed_successfully
+    environment:
+      MINIO_ENDPOINT: localstack:4566
+      MINIO_PUBLIC_ENDPOINT: localhost:4566
+      MINIO_ACCESS_KEY: test
+      MINIO_SECRET_KEY: test
+      MINIO_SECURE: "false"
+      MINIO_REGION: us-east-1
+      MINIO_BUCKET: arkon-files
+
+  api:
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+    environment:
+      MINIO_ENDPOINT: localstack:4566
+      MINIO_PUBLIC_ENDPOINT: localhost:4566
+      MINIO_ACCESS_KEY: test
+      MINIO_SECRET_KEY: test
+      MINIO_SECURE: "false"
+      MINIO_REGION: us-east-1
+      MINIO_BUCKET: arkon-files
+
+  worker:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    environment:
+      MINIO_ENDPOINT: localstack:4566
+      MINIO_PUBLIC_ENDPOINT: localhost:4566
+      MINIO_ACCESS_KEY: test
+      MINIO_SECRET_KEY: test
+      MINIO_SECURE: "false"
+      MINIO_REGION: us-east-1
+      MINIO_BUCKET: arkon-files
+
+  worker_skills:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    environment:
+      MINIO_ENDPOINT: localstack:4566
+      MINIO_PUBLIC_ENDPOINT: localhost:4566
+      MINIO_ACCESS_KEY: test
+      MINIO_SECRET_KEY: test
+      MINIO_SECURE: "false"
+      MINIO_REGION: us-east-1
+      MINIO_BUCKET: arkon-files
+
+volumes:
+  localstack_data:

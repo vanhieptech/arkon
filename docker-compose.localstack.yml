@@ -1,0 +1,103 @@
+# LocalStack overlay — S3-compatible storage for Arkon POC.
+#
+# Usage:
+#   cp .env.localstack.example .env.docker   # or merge into .env.docker
+#   docker compose -f docker-compose.yml -f docker-compose.localstack.yml up -d --build
+#
+# Bedrock uses real AWS credentials (not emulated here). S3 uses LocalStack.
+
+services:
+  localstack:
+    image: localstack/localstack:4.4
+    container_name: arkon_localstack
+    restart: unless-stopped
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: s3,secretsmanager,iam,sts
+      DEBUG: ${LOCALSTACK_DEBUG:-0}
+      PERSISTENCE: "1"
+      LOCALSTACK_AUTH_TOKEN: ${LOCALSTACK_AUTH_TOKEN:-}
+    volumes:
+      - localstack_data:/var/lib/localstack
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  localstack-init:
+    image: amazon/aws-cli:2.22.12
+    container_name: arkon_localstack_init
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: ${AWS_REGION:-us-east-1}
+      MINIO_BUCKET: ${MINIO_BUCKET:-arkon-files}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        ENDPOINT="http://localstack:4566"
+        BUCKET="${MINIO_BUCKET:-arkon-files}"
+        echo "Creating s3://$${BUCKET} on LocalStack..."
+        aws --endpoint-url="$ENDPOINT" s3 mb "s3://$${BUCKET}" 2>/dev/null || true
+        aws --endpoint-url="$ENDPOINT" s3 ls
+        echo "LocalStack S3 ready."
+    restart: "no"
+
+  migrator:
+    depends_on:
+      localstack-init:
+        condition: service_completed_successfully
+
+  api:
+    environment:
+      MINIO_ENDPOINT: localstack:4566
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-localhost:4566}
+      MINIO_ACCESS_KEY: test
+      MINIO_SECRET_KEY: test
+      MINIO_SECURE: "false"
+      MINIO_REGION: ${AWS_REGION:-us-east-1}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+    depends_on:
+      localstack:
+        condition: service_healthy
+      localstack-init:
+        condition: service_completed_successfully
+
+  worker:
+    environment:
+      MINIO_ENDPOINT: localstack:4566
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-localhost:4566}
+      MINIO_ACCESS_KEY: test
+      MINIO_SECRET_KEY: test
+      MINIO_SECURE: "false"
+      MINIO_REGION: ${AWS_REGION:-us-east-1}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+
+  worker_skills:
+    environment:
+      MINIO_ENDPOINT: localstack:4566
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-localhost:4566}
+      MINIO_ACCESS_KEY: test
+      MINIO_SECRET_KEY: test
+      MINIO_SECURE: "false"
+      MINIO_REGION: ${AWS_REGION:-us-east-1}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+
+volumes:
+  localstack_data:

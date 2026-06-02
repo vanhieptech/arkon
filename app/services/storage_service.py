@@ -13,6 +13,18 @@ from minio.error import S3Error
 from app.config import settings
 
 
+def _minio_client_kwargs(*, endpoint: str, secure: bool) -> dict:
+    kwargs: dict = {
+        "endpoint": endpoint,
+        "access_key": settings.minio_access_key,
+        "secret_key": settings.minio_secret_key,
+        "secure": secure,
+    }
+    if settings.minio_region:
+        kwargs["region"] = settings.minio_region
+    return kwargs
+
+
 class StorageService:
     """S3-compatible object storage via MinIO."""
 
@@ -24,10 +36,10 @@ class StorageService:
     def client(self) -> Minio:
         if self._client is None:
             self._client = Minio(
-                endpoint=settings.minio_endpoint,
-                access_key=settings.minio_access_key,
-                secret_key=settings.minio_secret_key,
-                secure=settings.minio_secure,
+                **_minio_client_kwargs(
+                    endpoint=settings.minio_endpoint,
+                    secure=settings.minio_secure,
+                )
             )
         return self._client
 
@@ -47,12 +59,10 @@ class StorageService:
                 True if settings.minio_public_endpoint else settings.minio_secure
             )
             client = Minio(
-                endpoint=public,
-                access_key=settings.minio_access_key,
-                secret_key=settings.minio_secret_key,
-                secure=presign_secure,
+                **_minio_client_kwargs(endpoint=public, secure=presign_secure)
             )
-            client._region_map[settings.minio_bucket] = "us-east-1"
+            region = settings.minio_region or "us-east-1"
+            client._region_map[settings.minio_bucket] = region
             self._presign_client = client
         return self._presign_client
 

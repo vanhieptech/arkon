@@ -55,7 +55,21 @@ class Settings(BaseSettings):
     minio_secret_key: str = Field(default="minioadmin123")
     minio_bucket: str = Field(default="arkon-files")
     minio_secure: bool = Field(default=False)
+    minio_region: str = Field(
+        default="",
+        description="S3 region (set to us-east-1 for LocalStack / AWS S3).",
+    )
     minio_presign_expiry_hours: int = Field(default=24)
+
+    # --- AWS (Bedrock + optional endpoint override) ---
+    aws_region: str = Field(
+        default="us-east-1",
+        description="AWS region for Bedrock and S3-compatible storage.",
+    )
+    aws_endpoint_url: str = Field(
+        default="",
+        description="Optional AWS SDK endpoint (rare for Bedrock; LocalStack uses minio_* vars).",
+    )
 
     # --- CORS ---
     cors_origins: str = Field(default="*")

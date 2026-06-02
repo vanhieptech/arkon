@@ -22,6 +22,7 @@ class ProviderType(str, Enum):
     GOOGLE = "google"
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
+    BEDROCK = "bedrock"
     OLLAMA = "ollama"
     VOYAGE = "voyage"
     COHERE = "cohere"

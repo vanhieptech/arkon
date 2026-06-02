@@ -1,0 +1,22 @@
+# Copy to terraform.tfvars and edit before: terraform apply
+
+aws_region    = "ap-southeast-1"
+project_name  = "arkon"
+instance_type = "t3.xlarge"
+
+# Required — EC2 key pair must exist in the target region
+key_name = "my-keypair"
+
+# Lock down SSH to your IP, e.g. "203.0.113.10/32"
+ssh_cidr = "0.0.0.0/0"
+
+arkon_repo_url    = "https://github.com/vanhieptech/arkon.git"
+arkon_repo_branch = "main"
+
+admin_email = "admin@yourcompany.com"
+# Leave null to auto-generate (shown in terraform output)
+# admin_password = "change-me-strong"
+
+poc_configure_bedrock  = true
+poc_llm_spec_id        = "bedrock/claude-3-5-sonnet"
+poc_embedding_spec_id  = "bedrock/titan-embed-v2"
