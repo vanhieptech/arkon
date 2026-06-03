@@ -8,6 +8,10 @@ Start with:
     arq app.worker.WorkerSettings
 """
 
+from app.logging_setup import configure_logging
+
+configure_logging()
+
 import asyncio
 import uuid
 import zipfile

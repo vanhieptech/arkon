@@ -3,6 +3,10 @@ Arkon — Enterprise AI Control Center.
 FastAPI application entry point.
 """
 
+from app.logging_setup import configure_logging
+
+configure_logging()
+
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -197,11 +201,17 @@ from app.routers import (  # noqa: E402
     wiki_branches,
     wiki_drafts,
     wiki_images,
+    agent_kb,
 )
 
 app.include_router(oauth.wellknown_router)
 app.include_router(oauth.router, prefix="/oauth", tags=["oauth"])
 app.include_router(auth.router, prefix="/api", tags=["auth"])
+app.include_router(
+    agent_kb.router,
+    prefix="/api/v1",
+    tags=["agent-kb"],
+)
 app.include_router(sources.router, prefix="/api", tags=["sources"])
 app.include_router(notes.router, prefix="/api", tags=["notes"])
 app.include_router(wiki_branches.router, prefix="/api", tags=["wiki-branches"])
