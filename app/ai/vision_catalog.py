@@ -75,6 +75,17 @@ VISION_CATALOG: dict[str, VisionModelSpec] = {
         cost_per_1m_input_tokens=0.15,
         cost_per_image=None,
     ),
+    # --- OpenRouter (same OpenAI-compatible client + base_url auto-routing) ---
+    "openrouter/owl-alpha": VisionModelSpec(
+        id="openrouter/owl-alpha",
+        provider="openai",
+        model_id="openrouter/owl-alpha",
+        max_image_size_mb=20,
+        label="OpenRouter Owl Alpha",
+        cost_per_1m_input_tokens=0.0,
+        cost_per_image=None,
+        notes="Multimodal Owl Alpha via OpenRouter. Shares llm_api_key when vision_api_key unset.",
+    ),
 }
 
 

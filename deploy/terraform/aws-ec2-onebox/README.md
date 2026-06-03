@@ -67,12 +67,10 @@ docker exec arkon_api python -m app.scripts.poc_verify
 terraform destroy
 ```
 
-## Promote from LocalStack POC
+## Promote from local MinIO to AWS S3
 
-Same env shape as local verify:
+On EC2, point storage at real S3:
 
 - `MINIO_ENDPOINT` → `s3.<region>.amazonaws.com`
 - `MINIO_SECURE=true`
 - `AWS_REGION` + IAM credentials (instance profile on EC2)
-
-LocalStack POC doc: `docs/deploy/AWS-LOCALSTACK-BEDROCK-POC.md`

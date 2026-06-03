@@ -365,6 +365,28 @@ async def list_pages(
     return list(result.scalars().all())
 
 
+async def search_pages_keyword(
+    session: AsyncSession,
+    query: str,
+    top_k: int = 10,
+    allowed_kt_slugs: Optional[list[str]] = None,
+    department_ids: Optional[list[uuid.UUID]] = None,
+    project_ids: Optional[list[uuid.UUID]] = None,
+    all_scopes: bool = False,
+) -> list[tuple[WikiPage, float]]:
+    """ILIKE keyword search on title, summary, content_md (agent hybrid leg)."""
+    pages = await list_pages(
+        session,
+        query=query,
+        limit=min(max(1, top_k), 50),
+        allowed_kt_slugs=allowed_kt_slugs,
+        department_ids=department_ids,
+        project_ids=project_ids,
+        all_scopes=all_scopes,
+    )
+    return [(page, max(0.01, 1.0 - i * 0.01)) for i, page in enumerate(pages)]
+
+
 async def search_pages_semantic(
     session: AsyncSession,
     query_embedding: list[float],

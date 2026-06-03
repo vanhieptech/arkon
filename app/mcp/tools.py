@@ -241,8 +241,6 @@ def register_tools(mcp: FastMCP):
             A ranked list of page slugs with titles, summaries, and similarity.
             Read the full page with `read_wiki_page(slug)`.
         """
-        import uuid as uuid_mod
-
         identity, err = await _get_identity()
         if err:
             return err
@@ -250,25 +248,16 @@ def register_tools(mcp: FastMCP):
 
         top_k = min(max(1, top_k), 50)
 
-        from app.ai.registry import ProviderRegistry
         from app.database import async_session_factory
-        from app.services import wiki_service
-
-        proj_uuids = [uuid_mod.UUID(p) for p in identity.project_ids] or None
+        from app.services import agent_kb_service, wiki_service
 
         async with async_session_factory() as session:
-            registry = ProviderRegistry(session)
-            embedding_provider = await registry.get_embedding(task="search_query")
-            query_embedding = await embedding_provider.embed(query)
+            query_embedding = await agent_kb_service.embed_search_query(session, query)
+            if query_embedding is None:
+                return f"Wiki search unavailable (embedding not configured): \"{query}\""
 
-            hits = await wiki_service.search_pages_semantic(
-                session,
-                query_embedding=query_embedding,
-                top_k=top_k,
-                allowed_kt_slugs=identity.allowed_knowledge_types,
-                department_ids=identity.department_ids,
-                project_ids=proj_uuids,
-                all_scopes=identity.is_admin,
+            hits = await agent_kb_service.semantic_search_pages(
+                session, identity, query_embedding, top_k,
             )
 
             # Out-of-scope peek — admins already see everything, so the hint
@@ -281,7 +270,7 @@ def register_tools(mcp: FastMCP):
                     query_embedding=query_embedding,
                     top_k=5,
                     department_ids=identity.department_ids,
-                    project_ids=proj_uuids,
+                    project_ids=agent_kb_service.project_scope_ids(identity),
                     inverse_scope=True,
                 )
                 oos_hint = await _format_oos_hint(session, oos_hits)

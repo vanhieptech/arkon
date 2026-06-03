@@ -1,5 +1,5 @@
 """
-POC verification — storage (S3/LocalStack), Bedrock LLM, Bedrock embedding.
+POC verification — storage (MinIO/S3), Bedrock LLM, Bedrock embedding.
 
   python -m app.scripts.poc_verify
 """
@@ -58,9 +58,8 @@ async def main() -> int:
 
     if not all_ok:
         logger.error(
-            "POC verify failed. Check AWS credentials, Bedrock model access, "
-            "and LocalStack (docker compose -f docker-compose.yml "
-            "-f docker-compose.localstack.yml)."
+            "POC verify failed. Check MinIO/S3 settings (MINIO_*), "
+            "AWS credentials, and Bedrock model access."
         )
         return 1
     logger.success("POC verify passed.")

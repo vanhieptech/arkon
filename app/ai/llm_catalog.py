@@ -211,11 +211,11 @@ LLM_CATALOG: dict[str, LLMModelSpec] = {
         context_window_tokens=1_048_576,
         max_output_tokens=262_144,
         supports_tools=True,
-        supports_vision=False,
-        label="OpenRouter Owl Alpha (1M, tools)",
+        supports_vision=True,
+        label="OpenRouter Owl Alpha (1M, tools + vision)",
         cost_per_1m_input_tokens=0.0,
         cost_per_1m_output_tokens=0.0,
-        notes="Hackathon parity LLM via OpenRouter. Set llm_base_url=https://openrouter.ai/api/v1 in Settings.",
+        notes="Multimodal via OpenRouter. base_url auto-set to openrouter.ai when unset.",
     ),
 }
 

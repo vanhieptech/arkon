@@ -13,8 +13,10 @@ COPY . .
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_TELEMETRY_DISABLED=1
+# Next 16 Turbopack build can OOM inside Docker Desktop; cap heap and use webpack in CI.
+ENV NODE_OPTIONS=--max-old-space-size=4096
 
-RUN npm run build
+RUN npm run build:docker
 
 # Stage 3: Runtime (minimal standalone image)
 FROM node:22-alpine AS runner

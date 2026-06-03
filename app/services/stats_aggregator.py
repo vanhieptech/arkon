@@ -173,8 +173,12 @@ async def _rollup_content(session: AsyncSession, target_date: date) -> list[dict
     rows.append({"metric_key": "wiki.revisions.daily", "value_numeric": float(revisions)})
 
     # Pages by page_type (snapshot, dimensioned)
+    # Use one labeled CASE expression for SELECT + GROUP BY — duplicate CASE trees
+    # make PostgreSQL reject the query (GroupingError on wiki_pages.slug).
+    page_type_expr = WikiPage.page_type.label("page_type")
     type_rows = (await session.execute(
-        select(WikiPage.page_type, func.count(WikiPage.id)).group_by(WikiPage.page_type)
+        select(page_type_expr, func.count(WikiPage.id))
+        .group_by(page_type_expr)
     )).all()
     for page_type, n in type_rows:
         rows.append({
@@ -549,6 +553,7 @@ async def run_daily_rollup(target_date: date) -> dict[str, int]:
             except Exception as exc:  # noqa: BLE001
                 logger.exception(f"stats: {name} rollup failed for {target_date}: {exc}")
                 written[name] = -1
+                await session.rollback()
         await session.commit()
     logger.info(f"stats: rollup complete for {target_date}: {written}")
     return written

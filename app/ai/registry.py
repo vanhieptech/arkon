@@ -246,12 +246,20 @@ class ProviderRegistry:
             or ""
         )
         base_url = await svc.get("embedding_base_url")
+        from app.ai.openrouter_compat import resolve_base_url
+
+        resolved_base = resolve_base_url(
+            spec_id=spec_id,
+            model_id=spec.model_id,
+            base_url=base_url,
+            api_key=api_key,
+        )
 
         return ProviderConfig(
             provider=ProviderType(spec.provider),
             api_key=api_key,
             model_id=spec.model_id,
-            base_url=base_url,
+            base_url=resolved_base,
             dimensions=spec.dimension,
             extra=_aws_extra(spec_id=spec.id),
         )
@@ -274,12 +282,20 @@ class ProviderRegistry:
 
         api_key = await svc.get("llm_api_key") or ""
         base_url = await svc.get("llm_base_url")
+        from app.ai.openrouter_compat import resolve_base_url
+
+        resolved_base = resolve_base_url(
+            spec_id=spec_id,
+            model_id=spec.model_id,
+            base_url=base_url,
+            api_key=api_key,
+        )
 
         return ProviderConfig(
             provider=ProviderType(spec.provider),
             api_key=api_key,
             model_id=spec.model_id,
-            base_url=base_url,
+            base_url=resolved_base,
             extra=_aws_extra(spec_id=spec.id),
             spec=spec,
         )
@@ -295,14 +311,22 @@ class ProviderRegistry:
             raise ValueError("No active vision model. Pick one in Settings → Vision.")
         spec = get_spec(spec_id)
 
-        api_key = await svc.get("vision_api_key") or ""
-        base_url = await svc.get("vision_base_url")
+        api_key = await svc.get("vision_api_key") or await svc.get("llm_api_key") or ""
+        base_url = await svc.get("vision_base_url") or await svc.get("llm_base_url")
+        from app.ai.openrouter_compat import resolve_base_url
+
+        resolved_base = resolve_base_url(
+            spec_id=spec_id,
+            model_id=spec.model_id,
+            base_url=base_url,
+            api_key=api_key,
+        )
 
         return ProviderConfig(
             provider=ProviderType(spec.provider),
             api_key=api_key,
             model_id=spec.model_id,
-            base_url=base_url,
+            base_url=resolved_base,
             extra={"spec_id": spec.id},
             spec=spec,
         )

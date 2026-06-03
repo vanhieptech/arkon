@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     minio_secure: bool = Field(default=False)
     minio_region: str = Field(
         default="",
-        description="S3 region (set to us-east-1 for LocalStack / AWS S3).",
+        description="S3 region (required for AWS S3; leave empty for local MinIO).",
     )
     minio_presign_expiry_hours: int = Field(default=24)
 
@@ -68,7 +68,7 @@ class Settings(BaseSettings):
     )
     aws_endpoint_url: str = Field(
         default="",
-        description="Optional AWS SDK endpoint (rare for Bedrock; LocalStack uses minio_* vars).",
+        description="Optional AWS SDK endpoint override (rare; storage uses minio_* vars).",
     )
 
     # --- CORS ---

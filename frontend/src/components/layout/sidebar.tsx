@@ -62,6 +62,7 @@ const navSections: NavSection[] = [
     requiredPermissions: ["org:audit:read", "org:settings:read", "org:settings:manage"],
     items: [
       { label: "Audit Log", href: "/audit", icon: "policy", requiredPermissions: ["org:audit:read"] },
+      { label: "Retrieval Lab", href: "/admin/retrieval-lab", icon: "science", requiredPermissions: ["org:settings:manage"] },
       { label: "Settings", href: "/settings", icon: "settings", requiredPermissions: ["org:settings:read"] },
     ],
   },

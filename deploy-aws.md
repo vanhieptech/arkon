@@ -7,8 +7,6 @@ Tài liệu này hướng dẫn **step-by-step** để deploy Arkon lên AWS the
 - LLM + Embedding dùng **Amazon Bedrock** (IAM auth).
 - Dùng Terraform template: `deploy/terraform/aws-ec2-onebox/` (1 lệnh `terraform apply`).
 
-> Nếu bạn đã test hạ tầng bằng LocalStack trước: bạn chỉ cần “promote” từ endpoint LocalStack sang endpoint S3 thật.
-
 ---
 
 ## 1) Kiến trúc triển khai
@@ -233,5 +231,4 @@ Template này ưu tiên “chạy được nhanh nhất”. Để production:
 - Template: `deploy/terraform/aws-ec2-onebox/README.md`
 - Bootstrap script: `deploy/terraform/aws-ec2-onebox/templates/user-data.sh.tftpl`
 - POC verify: `app/scripts/poc_verify.py`
-- LocalStack + Bedrock POC: `docs/deploy/AWS-LOCALSTACK-BEDROCK-POC.md`
 

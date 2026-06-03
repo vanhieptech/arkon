@@ -30,6 +30,25 @@ from app.ai.providers.base import (
 )
 
 
+def _make_async_openai_client(config: ProviderConfig):
+    import openai
+    from app.ai.openrouter_compat import default_headers, is_openrouter_route
+
+    kwargs: dict = {
+        "api_key": config.api_key,
+        "base_url": config.base_url,
+    }
+    if is_openrouter_route(
+        model_id=config.model_id,
+        base_url=config.base_url,
+        api_key=config.api_key,
+    ):
+        headers = default_headers()
+        if headers:
+            kwargs["default_headers"] = headers
+    return openai.AsyncOpenAI(**kwargs)
+
+
 class OpenAIEmbedding(EmbeddingProvider):
     """OpenAI embedding provider."""
 
@@ -40,11 +59,7 @@ class OpenAIEmbedding(EmbeddingProvider):
     @property
     def client(self):
         if self._client is None:
-            import openai
-            self._client = openai.AsyncOpenAI(
-                api_key=self.config.api_key,
-                base_url=self.config.base_url,  # None = default OpenAI
-            )
+            self._client = _make_async_openai_client(self.config)
         return self._client
 
     async def embed(self, text: str) -> list[float]:
@@ -103,11 +118,7 @@ class OpenAILLM(LLMProvider):
     @property
     def client(self):
         if self._client is None:
-            import openai
-            self._client = openai.AsyncOpenAI(
-                api_key=self.config.api_key,
-                base_url=self.config.base_url,
-            )
+            self._client = _make_async_openai_client(self.config)
         return self._client
 
     async def generate(
@@ -198,11 +209,7 @@ class OpenAIVision(VisionProvider):
     @property
     def client(self):
         if self._client is None:
-            import openai
-            self._client = openai.AsyncOpenAI(
-                api_key=self.config.api_key,
-                base_url=self.config.base_url,
-            )
+            self._client = _make_async_openai_client(self.config)
         return self._client
 
     async def analyze_image(
