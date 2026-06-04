@@ -59,7 +59,7 @@ export function McpTokenCard() {
             MCP Token
           </h3>
           <p className="text-xs text-muted-foreground">
-            Connect your Claude Desktop to Arkon
+            Connect your Claude Desktop to OneWiki
           </p>
         </div>
       </div>

@@ -148,7 +148,7 @@ export function NotificationChannelsCard() {
               id="smtp-from"
               value={settings.smtp_from || ""}
               onChange={(e) => update("smtp_from", e.target.value)}
-              placeholder='Arkon <noreply@your-org.example>'
+              placeholder='OneWiki <noreply@your-org.example>'
               disabled={!smtpEnabled || loading}
             />
           </div>
@@ -184,7 +184,7 @@ export function NotificationChannelsCard() {
           </label>
         </div>
         <p className="text-xs text-muted-foreground">
-          Every notification event is POSTed as JSON to this URL. If you set a secret, Arkon
+          Every notification event is POSTed as JSON to this URL. If you set a secret, OneWiki
           signs each payload with HMAC-SHA256 in the <code>X-Arkon-Signature</code> header.
         </p>
         <div className="grid gap-1">

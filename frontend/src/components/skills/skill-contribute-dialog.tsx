@@ -150,7 +150,7 @@ export function SkillContributeDialog({ skillId, skillName, versions, onContribu
             <DialogDescription className="font-manrope">
               {skillId
                 ? "Propose changes to improve this skill."
-                : "Propose a brand new skill to the Arkon platform."}
+                : "Propose a brand new skill to the OneWiki platform."}
             </DialogDescription>
           </DialogHeader>
 

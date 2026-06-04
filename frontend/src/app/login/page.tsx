@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
@@ -30,21 +31,31 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md px-8">
-        {/* Brand */}
+    <div className="min-h-[100dvh] flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md">
         <div className="text-center mb-10">
-          <h1 className="text-5xl tracking-tight text-foreground mb-2">
-            Arkon
+          <div className="flex justify-center mb-5">
+            <Image
+              src="/logo.png"
+              alt="OneWiki"
+              width={72}
+              height={72}
+              className="rounded-full"
+              priority
+            />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-2">
+            OneWiki
           </h1>
-          <p className="text-muted-foreground text-sm">
-            Enterprise AI Control Center
+          <p className="text-muted-foreground text-[17px] leading-relaxed">
+            Enterprise knowledge base for your AI workspace
           </p>
         </div>
 
-        {/* Login Card */}
-        <div className="bg-card rounded-xl border border-border shadow-sahara p-8">
-          <h2 className="text-2xl text-foreground mb-6">Sign in</h2>
+        <div className="bg-card rounded-lg border border-border shadow-card p-8">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground mb-6">
+            Sign in
+          </h2>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
@@ -54,12 +65,12 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@arkon.local"
+                placeholder="admin@your-org.example"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoFocus
-                className="bg-background"
+                className="bg-background rounded-lg h-11"
               />
             </div>
 
@@ -74,7 +85,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-background"
+                className="bg-background rounded-lg h-11"
               />
             </div>
 
@@ -87,7 +98,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground mt-2"
+              className="w-full h-11 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-normal text-[17px] mt-2"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -104,7 +115,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
-          Arkon v0.5 — On-Premise Deployment
+          OneWiki — On-Premise Deployment
         </p>
       </div>
     </div>

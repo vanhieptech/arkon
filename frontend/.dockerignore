@@ -1,6 +1,9 @@
 node_modules/
-.next/
 .env*
 !.env.example
 *.md
 .git/
+# Ignore cache; allow host prebuild output (see Makefile arkon-up / Dockerfile)
+.next/*
+!.next/standalone
+!.next/static

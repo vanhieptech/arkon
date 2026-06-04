@@ -201,14 +201,15 @@ function OrgHeader({
         <DropdownMenuTrigger className="flex items-center gap-2.5 rounded-md px-1.5 py-1.5 hover:bg-black/[0.03] transition-colors cursor-pointer min-w-0 flex-1">
           <Image
             src="/logo.png"
-            alt="Arkon"
-            width={24}
-            height={24}
-            className="shrink-0 rounded-[4px]"
+            alt="OneWiki"
+            width={28}
+            height={28}
+            className="shrink-0 rounded-full"
+            priority
           />
           <div className="flex flex-col items-start min-w-0">
-            <span className="text-[15px] font-semibold text-primary truncate leading-tight font-heading">
-              Arkon
+            <span className="text-[15px] font-semibold text-foreground truncate leading-tight tracking-tight">
+              OneWiki
             </span>
             {user && (
               <span className="text-[10px] text-muted-foreground/70 truncate leading-tight">
@@ -259,14 +260,14 @@ export function Sidebar() {
   });
 
   return (
-    <nav className="hidden md:flex flex-col h-full w-[240px] shrink-0 bg-[#f7f5f2] border-r border-black/[0.04]">
+    <nav className="hidden md:flex flex-col h-full w-[240px] shrink-0 bg-sidebar border-r border-border">
       {/* Org Header + User */}
       <div className="pt-2">
         <OrgHeader user={user} />
       </div>
 
       {/* Divider */}
-      <div className="mx-3 border-t border-black/[0.04] my-1" />
+      <div className="mx-3 border-t border-border my-1" />
 
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-1 sidebar-scrollbar">
@@ -292,9 +293,9 @@ export function Sidebar() {
       </div>
 
       {/* Bottom meta */}
-      <div className="px-3 py-2 border-t border-black/[0.04]">
-        <span className="text-[10px] text-muted-foreground/40 font-medium">
-          On-Premise · Internal
+      <div className="px-3 py-2 border-t border-border">
+        <span className="text-[10px] text-muted-foreground font-medium">
+          OneWiki · On-Premise
         </span>
       </div>
     </nav>

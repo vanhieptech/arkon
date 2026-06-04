@@ -12,7 +12,7 @@ export function StatCard({ label, value, icon, subtitle }: StatCardProps) {
         <span className="text-muted-foreground text-sm font-medium">
           {label}
         </span>
-        <span className="material-symbols-outlined text-primary-foreground bg-[var(--sahara-container)] p-2 rounded-lg text-base">
+        <span className="material-symbols-outlined text-primary-foreground bg-primary p-2 rounded-lg text-base">
           {icon}
         </span>
       </div>

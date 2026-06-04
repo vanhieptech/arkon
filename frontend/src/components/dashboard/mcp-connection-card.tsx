@@ -8,7 +8,7 @@ export function McpConnectionCard() {
 
   const configSnippet = `{
   "mcpServers": {
-    "arkon": {
+    "onewiki": {
       "url": "${typeof window !== "undefined" ? window.location.origin : "https://your-server"}/mcp",
       "headers": {
         "Authorization": "Bearer <your-mcp-token>"
@@ -29,10 +29,10 @@ export function McpConnectionCard() {
         MCP Connection
       </h3>
       <p className="text-xs text-muted-foreground mb-4">
-        Connect Claude Desktop to Arkon with this config snippet.
+        Connect Claude Desktop to OneWiki with this config snippet.
       </p>
 
-      <div className="bg-[#3a302a] rounded-lg p-4 font-mono text-xs text-[#faf5ee] overflow-x-auto">
+      <div className="bg-[#1d1d1f] rounded-lg p-4 font-mono text-xs text-[#f5f5f7] overflow-x-auto">
         <pre>{configSnippet}</pre>
       </div>
 
